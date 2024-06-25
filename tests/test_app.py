@@ -1,30 +1,26 @@
 from http import HTTPStatus
 
-from fastapi.testclient import TestClient
 
-from todolist_api.app import app
-
-
-def test_read_root_return_ok_and_json():
-    client = TestClient(app)  # arrange
-
+def test_read_root_return_ok_and_json(client):
     response = client.get("/")  # act
 
     assert response.status_code == HTTPStatus.OK  # assert
     assert response.json() == {"message": "Hello World!"}
 
 
-def test_html_response_return_ok_and_html():
-    client = TestClient(app)
-
-    response = client.get("/html_response")
-
-    assert response.status_code == HTTPStatus.OK
-    assert (
-        response.text
-        == """
-    <div>
-        <h1>Título</>
-    </div>
-    """
+def test_create_user(client):
+    response = client.post(
+        "/users/",
+        json={
+            "username": "nometeste",
+            "email": "emailteste@teste.com",
+            "password": "senhateste123",
+        },
     )
+
+    assert response.status_code == HTTPStatus.CREATED
+    assert response.json() == {
+        "id": 1,
+        "username": "nometeste",
+        "email": "emailteste@teste.com",
+    }
