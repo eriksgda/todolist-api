@@ -14,7 +14,9 @@ def read_root():
 
 
 @app.get(
-    "/html_response", status_code=HTTPStatus.OK, response_class=HTMLResponse
+    "/html_response",
+    status_code=HTTPStatus.OK,
+    response_class=HTMLResponse,
 )
 def html_response():
     return """

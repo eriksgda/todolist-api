@@ -20,3 +20,11 @@ def test_html_response_return_ok_and_html():
     response = client.get("/html_response")
 
     assert response.status_code == HTTPStatus.OK
+    assert (
+        response.text
+        == """
+    <div>
+        <h1>Título</>
+    </div>
+    """
+    )
