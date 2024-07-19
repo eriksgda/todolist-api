@@ -1,5 +1,9 @@
 from http import HTTPStatus
 
+from sqlalchemy import select, or_, func
+from todolist_api.models import User
+from todolist_api.database import get_session
+
 from fastapi import FastAPI, HTTPException
 
 from todolist_api.schemas import (
@@ -22,11 +26,34 @@ def read_root():
 
 @app.post("/users/", status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema):
-    user_with_id = UserDB(**user.model_dump(), id=len(database) + 1)
+    session = get_session()
 
-    database.append(user_with_id)
+    db_user = session.scalar(select(User).where(or_(User.username == user.username, User.email == user.email)))
+    
+    if db_user: 
+        if db_user.username == user.username:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail="Username already exists"
+            )
+        elif db_user.email == user.email:
+            raise HTTPException(
+                status_code=HTTPStatus.BAD_REQUEST,
+                detail="Email already exists"
+            )
+        
+    db_user = User(
+        username=user.username, 
+        email=user.email, 
+        password=user.password
+    )
+    db_user.update_at = func.now();
 
-    return user_with_id
+    session.add(db_user)
+    session.commit()
+    session.refresh(db_user)
+
+    return db_user
 
 
 @app.get("/users/", status_code=HTTPStatus.OK, response_model=UserList)
