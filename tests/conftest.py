@@ -6,7 +6,7 @@ from sqlalchemy.pool import StaticPool
 
 from todolist_api.app import app
 from todolist_api.database import get_session
-from todolist_api.models import table_registry
+from todolist_api.models import User, table_registry
 
 
 @pytest.fixture()
@@ -34,3 +34,17 @@ def session():
         yield session
 
     table_registry.metadata.drop_all(engine)
+
+
+@pytest.fixture()
+def user(session):
+    user_test = User(
+        username="nometeste",
+        email="emailteste@teste.com",
+        password="senhateste123",
+    )
+    session.add(user_test)
+    session.commit()
+    session.refresh(user_test)
+
+    return user_test
