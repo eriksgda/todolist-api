@@ -25,26 +25,26 @@ def read_root():
 
 @app.post("/users/", status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema, session=Depends(get_session)):
-    db_user = session.scalar(select(User)
-                             .where(or_(User.username == user.username,
-                                        User.email == user.email)))
+    db_user = session.scalar(
+        select(User).where(
+            or_(User.username == user.username, User.email == user.email)
+        )
+    )
 
     if db_user:
         if db_user.username == user.username:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                detail="Username already exists"
+                detail="Username already exists",
             )
         elif db_user.email == user.email:
             raise HTTPException(
                 status_code=HTTPStatus.BAD_REQUEST,
-                detail="Email already exists"
+                detail="Email already exists",
             )
 
     db_user = User(
-        username=user.username,
-        email=user.email,
-        password=user.password
+        username=user.username, email=user.email, password=user.password
     )
     db_user.update_at = func.now()
 
@@ -56,8 +56,9 @@ def create_user(user: UserSchema, session=Depends(get_session)):
 
 
 @app.get("/users/", status_code=HTTPStatus.OK, response_model=UserList)
-def read_users():
-    return {"users": database}
+def read_users(session=Depends(get_session), limit=10, offset=0):
+    users = session.scalars(select(User).limit(limit).offset(offset))
+    return {"users": users}
 
 
 @app.put(
