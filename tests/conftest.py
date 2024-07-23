@@ -7,6 +7,7 @@ from sqlalchemy.pool import StaticPool
 from todolist_api.app import app
 from todolist_api.database import get_session
 from todolist_api.models import User, table_registry
+from todolist_api.security import get_password_hash
 
 
 @pytest.fixture()
@@ -38,11 +39,13 @@ def session():
 
 @pytest.fixture()
 def user(session):
+    pwd = "senhateste123"
     user_test = User(
         username="nometeste",
         email="emailteste@teste.com",
-        password="senhateste123",
+        password=get_password_hash(pwd),
     )
+
     session.add(user_test)
     session.commit()
     session.refresh(user_test)
