@@ -45,7 +45,7 @@ quote-style = "double"
 run = "fastapi dev todolist_api/app.py"
 
 pre_test = "task lint"
-test = "pytest -s -x --cov=todolist_api -vv"
+test = "pytest -s --cov=todolist_api -vv"
 post_test = "coverage html"
 
 lint = "ruff check . && ruff check . --diff"
