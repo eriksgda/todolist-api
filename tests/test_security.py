@@ -2,14 +2,16 @@ from http import HTTPStatus
 
 from jwt import decode
 
-from todolist_api.security import ALGORITHM, SECRET_KEY, create_access_token
+from todolist_api.security import create_access_token, settings
 
 
 def test_create_jwt_token():
     data = {"sub": "emailteste@teste.com"}
     token = create_access_token(data)
 
-    result = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    result = decode(
+        token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+    )
 
     assert result["sub"] == data["sub"]
     assert result["exp"]
