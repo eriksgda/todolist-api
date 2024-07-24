@@ -51,3 +51,13 @@ def user(session):
     session.refresh(user_test)
 
     return user_test
+
+
+@pytest.fixture()
+def token(client, user):
+    response = client.post(
+        "/token",
+        data={"username": user.email, "password": "senhateste123"},
+    )
+
+    return response.json()["access_token"]
