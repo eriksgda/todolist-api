@@ -111,9 +111,9 @@ def test_update_user_unauthorized(client):
     assert response.json() == {"detail": "Not authenticated"}
 
 
-def test_update_user_pathvariable_error(client, user, token):
+def test_update_user_pathvariable_error(client, other_user, token):
     response = client.put(
-        f"/users/{user.id + 1}",
+        f"/users/{other_user.id}",
         headers={"Authorization": f"Bearer {token}"},
         json={
             "username": "nometeste2",
@@ -143,9 +143,9 @@ def test_delete_user_unauthorized(client):
     assert response.json() == {"detail": "Not authenticated"}
 
 
-def test_delete_user_pathvariable_error(client, user, token):
+def test_delete_user_pathvariable_error(client, other_user, token):
     response = client.delete(
-        f"/users/{user.id + 1}",
+        f"/users/{other_user.id}",
         headers={"Authorization": f"Bearer {token}"},
     )
 
