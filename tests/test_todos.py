@@ -25,12 +25,15 @@ def test_create_todo(client, token):
             "state": "draft",
         },
     )
-    assert response.json() == {
-        "id": 1,
-        "title": "Test todo",
-        "description": "Test todo description",
-        "state": "draft",
-    }
+
+    data = response.json()
+    assert data["id"] == 1
+    assert data["title"] == "Test todo"
+    assert data["description"] == "Test todo description"
+    assert data["state"] == "draft"
+
+    assert "created_at" in data
+    assert "update_at" in data
 
 
 def test_read_todos_should_return_five_todos(session, client, user, token):
