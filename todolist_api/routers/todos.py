@@ -7,7 +7,13 @@ from sqlalchemy.orm import Session
 
 from todolist_api.database import get_session
 from todolist_api.models import Todo, User
-from todolist_api.schemas import TodoList, TodoPublic, TodoSchema, TodoUpdate
+from todolist_api.schemas import (
+    Message,
+    TodoList,
+    TodoPublic,
+    TodoSchema,
+    TodoUpdate,
+)
 from todolist_api.security import get_current_user
 
 router = APIRouter(prefix="/todos", tags=["todos"])
@@ -84,3 +90,22 @@ def update_todo(
     session.refresh(db_todo)
 
     return db_todo
+
+
+@router.delete("/{todo_id}", response_model=Message)
+def delete_todo(
+    todo_id: int, session: T_Session, current_user: T_Current_User
+):
+    todo = session.scalar(
+        select(Todo).where(Todo.user_id == current_user.id, Todo.id == todo_id)
+    )
+
+    if not todo:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail="Task not found."
+        )
+
+    session.delete(todo)
+    session.commit()
+
+    return {"message": "Task has been deleted successfully."}
