@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 import factory.fuzzy
 
 from todolist_api.models import Todo, TodoState
@@ -140,3 +142,28 @@ def test_list_todos_filter_combined_should_return_five_todos(
     )
 
     assert len(response.json()["todos"]) == expected_todos
+
+
+def test_update_todo_error(client, token):
+    response = client.patch(
+        "/todos/1", headers={"Authorization": f"Bearer {token}"}, json={}
+    )
+
+    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.json() == {"detail": "Task not found."}
+
+
+def test_upadte_todo(session, client, user, token):
+    todo = TodoFactory(user_id=user.id)
+
+    session.add(todo)
+    session.commit()
+
+    response = client.patch(
+        f"/todos/{todo.id}",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"title": "teste!"},
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()["title"] == "teste!"
