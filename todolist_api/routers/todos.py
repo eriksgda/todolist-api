@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -62,22 +62,20 @@ def read_todos(  # noqa
 
 @router.patch("/{todo_id}", response_model=TodoPublic)
 def update_todo(
-    todo_id: int, 
-    session: T_Session, 
-    current_user: T_Current_User, 
-    todo: TodoUpdate 
+    todo_id: int,
+    session: T_Session,
+    current_user: T_Current_User,
+    todo: TodoUpdate,
 ):
-    
     db_todo = session.scalar(
-        select(Todo).where(
-            Todo.user_id == current_user.id, Todo.id == todo_id)
+        select(Todo).where(Todo.user_id == current_user.id, Todo.id == todo_id)
     )
 
     if not db_todo:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail="Task not found."
         )
-    
+
     for key, value in todo.model_dump(exclude_unset=True).items():
         setattr(db_todo, key, value)
 
